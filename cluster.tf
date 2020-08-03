@@ -41,6 +41,12 @@ resource "aws_ecs_service" "webserver" {
             aws_security_group.airflow-db-user.id
         ]
     }
+
+    load_balancer {
+    	target_group_arn  = aws_alb_target_group.webserver-group.arn
+    	container_port    = 8080
+    	container_name    = "webserver"
+	}
 }
 
 

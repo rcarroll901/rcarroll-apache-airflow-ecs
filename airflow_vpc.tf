@@ -93,6 +93,3 @@ resource "aws_key_pair" "just_city" {
     }
 }
 
-output "bastion_public_ip" {
-    value = aws_instance.bastion.public_ip
-}
