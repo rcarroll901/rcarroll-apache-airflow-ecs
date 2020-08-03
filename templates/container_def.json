@@ -1,0 +1,54 @@
+[
+    {
+      "name": "${name}",
+      "image": "${account_id}.dkr.ecr.us-east-2.amazonaws.com/jc-pipeline",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8793,
+          "hostPort": 8793
+        },
+        {
+          "containerPort": 5432,
+          "hostPort": 5432
+        },
+        {
+          "containerPort": 5555,
+          "hostPort": 5555
+        },
+        {
+          "containerPort": 5672,
+          "hostPort": 5672
+        },
+        {
+          "containerPort": 8080,
+          "hostPort": 8080
+        }
+      ],
+      "command": [
+          "${name}"
+      ],
+      "secrets": [{
+        "name": "GITHUB_SSH_PRIVATE_KEY",
+        "valueFrom": "${private_key_arn}"
+        }],
+      "environment": [
+          {"name": "LOAD_EX",
+            "value": "n"},
+          {"name": "FERNET_KEY",
+            "value": "46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho="},
+          {"name": "EXECUTOR",
+            "value": "Celery"},
+          {"name": "POSTGRES_USER",
+            "value": "airflow"},
+          {"name": "POSTGRES_PASSWORD",
+            "value": "airflow"},
+          {"name": "POSTGRES_DB",
+            "value": "airflow"},
+          {"name": "QUEUE_HOST",
+            "value": "${queue_ip}"}
+          ],
+      "memory": 500,
+      "cpu": 2
+    }
+]
