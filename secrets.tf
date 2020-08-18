@@ -1,5 +1,6 @@
 resource "aws_secretsmanager_secret" "github_ssh_private_key" {
-    name = "jc_pipeline_github_ssh_private_key"
+    name = "jc_pipeline_github_ssh_private_key_new"
+    recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "github_ssh_private_key" {

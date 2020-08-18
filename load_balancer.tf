@@ -2,7 +2,7 @@
 resource "aws_alb" "webserver-load-balancer" {
     name = "webserver-load-balancer"
     security_groups = [aws_security_group.webserver.id]
-    subnets = [aws_subnet.public.id]
+    subnets = [aws_subnet.public.id, aws_subnet.private.id]
 }
 
 resource "aws_alb_target_group" "webserver-group" {
@@ -10,6 +10,7 @@ resource "aws_alb_target_group" "webserver-group" {
     port                = "8080"
     protocol            = "HTTP"
     vpc_id              = aws_vpc.airflow.id
+    target_type         = "ip"
 
     health_check {
         healthy_threshold   = "5"

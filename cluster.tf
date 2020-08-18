@@ -8,8 +8,11 @@ resource "aws_ecs_cluster" "jc_pipeline" {
 resource "aws_ecs_task_definition" "webserver" {
     family                = "webserver"
     requires_compatibilities = ["FARGATE"]
+    cpu = 256
+    memory = 512
     execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
     container_definitions = data.template_file.webserver.rendered
+    network_mode = "awsvpc"
 }
 
 data  "template_file" "webserver" {
@@ -19,7 +22,6 @@ data  "template_file" "webserver" {
         name = "webserver"
         account_id = var.account_id
         private_key_arn = aws_secretsmanager_secret.github_ssh_private_key.arn
-        port1 = 8080
         queue_ip = "jc.pipeline.queue"
     }
 }
@@ -35,7 +37,6 @@ resource "aws_ecs_service" "webserver" {
         security_groups = [
             aws_security_group.ssh-from-bastion.id,
             aws_security_group.webserver.id,
-            aws_security_group.worker-user.id,
             aws_security_group.queue-user.id,
             aws_security_group.flower-user.id,
             aws_security_group.airflow-db-user.id
@@ -55,8 +56,11 @@ resource "aws_ecs_service" "webserver" {
 resource "aws_ecs_task_definition" "scheduler" {
     family                = "scheduler"
     requires_compatibilities = ["FARGATE"]
+    cpu = 256
+    memory = 512
     execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
     container_definitions = data.template_file.scheduler.rendered
+    network_mode = "awsvpc"
 }
 
 data  "template_file" "scheduler" {
@@ -93,8 +97,11 @@ resource "aws_ecs_service" "scheduler" {
 resource "aws_ecs_task_definition" "worker" {
     family                = "worker"
     requires_compatibilities = ["FARGATE"]
+    cpu = 256
+    memory = 512
     execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
     container_definitions = data.template_file.worker.rendered
+    network_mode = "awsvpc"
 }
 
 data  "template_file" "worker" {
@@ -132,8 +139,11 @@ resource "aws_ecs_service" "worker" {
 resource "aws_ecs_task_definition" "flower" {
     family                = "flower"
     requires_compatibilities = ["FARGATE"]
+    cpu = 256
+    memory = 512
     execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
     container_definitions = data.template_file.flower.rendered
+    network_mode = "awsvpc"
 }
 
 data  "template_file" "flower" {
@@ -142,7 +152,7 @@ data  "template_file" "flower" {
     vars = {
         name = "flower"
         account_id = var.account_id
-        private_key_arn = aws_secretsmanager_secret.github_ssh_private_key.arn
+        private_key_arn = ""
         queue_ip = "jc.pipeline.queue"
     }
 }
@@ -170,10 +180,15 @@ resource "aws_ecs_task_definition" "queue" {
     family                = "rabbitmq"
     requires_compatibilities = ["FARGATE"]
     execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
+    network_mode = "awsvpc"
+    cpu = 256
+    memory = 512
     container_definitions = <<DEFINITION
 [
   {
     "name": "rabbitmq",
+    "cpu": 2,
+    "memory": 500,
     "image": "rabbitmq:latest",
     "essential": true,
     "portMappings": [
@@ -181,9 +196,7 @@ resource "aws_ecs_task_definition" "queue" {
         "containerPort": 5672,
         "hostPort": 5672
       }
-    ],
-    "memory": 500,
-    "cpu": 2
+    ]
   }
 ]
 DEFINITION

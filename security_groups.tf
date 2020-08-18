@@ -211,7 +211,7 @@ resource "aws_security_group_rule" "worker-user-out" {
 
 # WEBSERVER (connect to rds, workers, bastion)
 resource "aws_security_group" "webserver" {
-    name = "jc_pipeline_worker"
+    name = "jc_pipeline_webserver"
     description = "For webserver instances with access to rds, queue, flower, and workers"
     vpc_id = aws_vpc.airflow.id
     tags = {
@@ -227,4 +227,13 @@ resource "aws_security_group_rule" "webserver-from-world" {
     # restrict this to only necessary IPs
     security_group_id = aws_security_group.webserver.id
     cidr_blocks = ["0.0.0.0/0"] # how to keep this dynamic and allow multiple?
+}
+
+resource "aws_security_group_rule" "worker-user-out-webserver" {
+    type = "egress"
+    security_group_id = aws_security_group.webserver.id
+    source_security_group_id = aws_security_group.worker.id
+    from_port = 8793
+    to_port = 8793
+    protocol = "tcp"
 }

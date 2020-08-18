@@ -28,10 +28,7 @@
       "command": [
           "${name}"
       ],
-      "secrets": [{
-        "name": "GITHUB_SSH_PRIVATE_KEY",
-        "valueFrom": "${private_key_arn}"
-        }],
+      "secrets": [%{ if private_key_arn != "" ~}${jsonencode({"name"= "GITHUB_SSH_PRIVATE_KEY", "valueFrom"= "${private_key_arn}[0]"})}%{ endif ~}],
       "environment": [
           {"name": "LOAD_EX",
             "value": "n"},
@@ -49,6 +46,7 @@
             "value": "${queue_ip}"}
           ],
       "memory": 500,
-      "cpu": 2
+      "cpu": 256
     }
 ]
+

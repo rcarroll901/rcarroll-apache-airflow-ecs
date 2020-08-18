@@ -22,3 +22,11 @@ variable "github_key_path" {
 variable "account_id" {
     description = "IAM account ID"
 }
+
+variable "database_username" {
+    description = "username to log into databases"
+}
+
+variable "database_password" {
+    description = "password to log into databases"
+}

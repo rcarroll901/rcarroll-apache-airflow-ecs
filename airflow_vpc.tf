@@ -67,13 +67,13 @@ resource "aws_route_table_association" "public-rta" {
 resource "aws_route" "nat" {
   route_table_id            = aws_vpc.airflow.main_route_table_id
   destination_cidr_block    = "0.0.0.0/0"
-  gateway_id                = aws_nat_gateway.airflow.id
+  nat_gateway_id                = aws_nat_gateway.airflow.id
 }
 
 
 # BASTION SETUP
 resource "aws_instance" "bastion" {
-    ami = "ami-061eb2b23f9f8839c"
+    ami = "ami-078d79190068a1b35"
     associate_public_ip_address = true
     instance_type = "t2.nano"
     subnet_id = aws_subnet.public.id
