@@ -1,6 +1,6 @@
 
 # ECS task execution role data
-data "aws_iam_policy_document" "ecs_task_execution_role" {
+data "aws_iam_policy_document" "ecs_task_role" {
   version = "2012-10-17"
   statement {
     sid = ""
@@ -14,14 +14,21 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
-resource "aws_iam_role" "jc_ecs_task_execution_role" {
+resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "ecsJCPipelineTaskExecutionRole"
-  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-  role       = aws_iam_role.jc_ecs_task_execution_role.name
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+
+# TASK ROLE
+resource "aws_iam_role" "secret_task_role" {
+  name        = "jcPipelineTaskRole"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_role.json
 }
 
 data "aws_iam_policy_document" "ecs_secret_policy" {
@@ -46,7 +53,7 @@ resource "aws_iam_policy" "ecs_secret_policy" {
     policy = data.aws_iam_policy_document.ecs_secret_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_secret_policy" {
-  role       = aws_iam_role.jc_ecs_task_execution_role.name
+resource "aws_iam_role_policy_attachment" "secret_task_role" {
+  role       = aws_iam_role.secret_task_role.name
   policy_arn = aws_iam_policy.ecs_secret_policy.arn
 }

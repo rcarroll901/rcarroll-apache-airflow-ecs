@@ -2,6 +2,14 @@
     {
       "name": "${name}",
       "image": "${account_id}.dkr.ecr.us-east-2.amazonaws.com/jc-pipeline",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "practice",
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "${name}"
+        }
+    },
       "essential": true,
       "portMappings": [
         {
@@ -28,7 +36,7 @@
       "command": [
           "${name}"
       ],
-      "secrets": [%{ if private_key_arn != "" ~}${jsonencode({"name"= "GITHUB_SSH_PRIVATE_KEY", "valueFrom"= "${private_key_arn}[0]"})}%{ endif ~}],
+      "secrets": [%{ if private_key_arn != "" ~}${jsonencode({"name"= "GITHUB_SSH_PRIVATE_KEY", "valueFrom"= "${private_key_arn}"})}%{ endif ~}],
       "environment": [
           {"name": "LOAD_EX",
             "value": "n"},

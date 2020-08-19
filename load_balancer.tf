@@ -1,16 +1,17 @@
 
 resource "aws_alb" "webserver-load-balancer" {
     name = "webserver-load-balancer"
-    security_groups = [aws_security_group.webserver.id]
+    security_groups = [aws_security_group.load-balancer.id]
     subnets = [aws_subnet.public.id, aws_subnet.private.id]
 }
 
 resource "aws_alb_target_group" "webserver-group" {
     name                = "webserver-group"
-    port                = "8080"
+    port                = "80"
     protocol            = "HTTP"
     vpc_id              = aws_vpc.airflow.id
     target_type         = "ip"
+    depends_on = [aws_alb.webserver-load-balancer]
 
     health_check {
         healthy_threshold   = "5"
@@ -30,7 +31,7 @@ resource "aws_alb_target_group" "webserver-group" {
 
 resource "aws_alb_listener" "alb-listener" {
     load_balancer_arn = aws_alb.webserver-load-balancer.arn
-    port              = "8080"
+    port              = "80"
     protocol          = "HTTP"
     
     default_action {

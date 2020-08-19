@@ -10,7 +10,8 @@ resource "aws_ecs_task_definition" "webserver" {
     requires_compatibilities = ["FARGATE"]
     cpu = 256
     memory = 512
-    execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
+    task_role_arn = aws_iam_role.secret_task_role.arn
+    execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.webserver.rendered
     network_mode = "awsvpc"
 }
@@ -30,7 +31,9 @@ resource "aws_ecs_service" "webserver" {
   	name            = "webserver"
   	cluster         = aws_ecs_cluster.jc_pipeline.id
   	task_definition = aws_ecs_task_definition.webserver.family
+    launch_type = "FARGATE"
   	desired_count   = 1
+    depends_on = [aws_alb_target_group.webserver-group]
 
     network_configuration {
         subnets = [aws_subnet.public.id]
@@ -41,6 +44,7 @@ resource "aws_ecs_service" "webserver" {
             aws_security_group.flower-user.id,
             aws_security_group.airflow-db-user.id
         ]
+        assign_public_ip = true
     }
 
     load_balancer {
@@ -48,6 +52,7 @@ resource "aws_ecs_service" "webserver" {
     	container_port    = 8080
     	container_name    = "webserver"
 	}
+
 }
 
 
@@ -58,7 +63,8 @@ resource "aws_ecs_task_definition" "scheduler" {
     requires_compatibilities = ["FARGATE"]
     cpu = 256
     memory = 512
-    execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
+    task_role_arn = aws_iam_role.secret_task_role.arn
+    execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.scheduler.rendered
     network_mode = "awsvpc"
 }
@@ -78,6 +84,7 @@ resource "aws_ecs_service" "scheduler" {
   	name            = "scheduler"
   	cluster         = aws_ecs_cluster.jc_pipeline.id
   	task_definition = aws_ecs_task_definition.scheduler.family
+    launch_type = "FARGATE"
   	desired_count   = 1
     
     network_configuration {
@@ -99,7 +106,8 @@ resource "aws_ecs_task_definition" "worker" {
     requires_compatibilities = ["FARGATE"]
     cpu = 256
     memory = 512
-    execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
+    task_role_arn = aws_iam_role.secret_task_role.arn
+    execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.worker.rendered
     network_mode = "awsvpc"
 }
@@ -119,6 +127,7 @@ resource "aws_ecs_service" "worker" {
   	name            = "worker"
   	cluster         = aws_ecs_cluster.jc_pipeline.id
   	task_definition = aws_ecs_task_definition.worker.family
+    launch_type = "FARGATE"
   	desired_count   = 3
 
     network_configuration {
@@ -141,7 +150,8 @@ resource "aws_ecs_task_definition" "flower" {
     requires_compatibilities = ["FARGATE"]
     cpu = 256
     memory = 512
-    execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
+    task_role_arn = aws_iam_role.secret_task_role.arn
+    execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.flower.rendered
     network_mode = "awsvpc"
 }
@@ -161,6 +171,7 @@ resource "aws_ecs_service" "flower" {
   	name            = "flower"
   	cluster         = aws_ecs_cluster.jc_pipeline.id
   	task_definition = aws_ecs_task_definition.flower.family
+    launch_type = "FARGATE"
   	desired_count   = 1
 
     network_configuration {
@@ -179,7 +190,8 @@ resource "aws_ecs_service" "flower" {
 resource "aws_ecs_task_definition" "queue" {
     family                = "rabbitmq"
     requires_compatibilities = ["FARGATE"]
-    execution_role_arn = aws_iam_role.jc_ecs_task_execution_role.arn
+    task_role_arn = aws_iam_role.secret_task_role.arn
+    execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     network_mode = "awsvpc"
     cpu = 256
     memory = 512
@@ -206,6 +218,7 @@ resource "aws_ecs_service" "queue" {
   	name            = "queue"
   	cluster         = aws_ecs_cluster.jc_pipeline.id
   	task_definition = aws_ecs_task_definition.queue.family
+    launch_type = "FARGATE"
   	desired_count   = 1
 
     service_registries {

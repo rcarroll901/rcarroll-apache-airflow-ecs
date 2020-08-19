@@ -224,9 +224,9 @@ resource "aws_security_group_rule" "webserver-from-world" {
     from_port = 8080
     to_port = 8080
     protocol = "tcp"
-    # restrict this to only necessary IPs
     security_group_id = aws_security_group.webserver.id
-    cidr_blocks = ["0.0.0.0/0"] # how to keep this dynamic and allow multiple?
+    source_security_group_id = aws_security_group.load-balancer.id
+
 }
 
 resource "aws_security_group_rule" "worker-user-out-webserver" {
@@ -235,5 +235,34 @@ resource "aws_security_group_rule" "worker-user-out-webserver" {
     source_security_group_id = aws_security_group.worker.id
     from_port = 8793
     to_port = 8793
+    protocol = "tcp"
+}
+
+# Load balancer
+resource "aws_security_group" "load-balancer" {
+    name = "jc_pipeline_alb"
+    description = "ALB for webserver tasks"
+    vpc_id = aws_vpc.airflow.id
+    tags = {
+        Name = "airflow-alb"
+    }
+}
+
+resource "aws_security_group_rule" "alb-from-world" {
+    type = "ingress"
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    # restrict this to only necessary IPs
+    security_group_id = aws_security_group.load-balancer.id
+    cidr_blocks = ["0.0.0.0/0"] 
+}
+
+resource "aws_security_group_rule" "alb-to-webserver" {
+    type = "egress"
+    security_group_id = aws_security_group.load-balancer.id
+    source_security_group_id = aws_security_group.webserver.id
+    from_port = 8080
+    to_port = 8080
     protocol = "tcp"
 }
