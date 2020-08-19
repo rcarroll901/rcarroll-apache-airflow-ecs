@@ -7,7 +7,7 @@ resource "aws_alb" "webserver-load-balancer" {
 
 resource "aws_alb_target_group" "webserver-group" {
     name                = "webserver-group"
-    port                = "80"
+    port                = "8080"
     protocol            = "HTTP"
     vpc_id              = aws_vpc.airflow.id
     target_type         = "ip"
@@ -31,7 +31,7 @@ resource "aws_alb_target_group" "webserver-group" {
 
 resource "aws_alb_listener" "alb-listener" {
     load_balancer_arn = aws_alb.webserver-load-balancer.arn
-    port              = "80"
+    port              = "8080"
     protocol          = "HTTP"
     
     default_action {

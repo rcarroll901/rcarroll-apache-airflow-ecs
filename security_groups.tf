@@ -190,6 +190,15 @@ resource "aws_security_group_rule" "worker-user-in" {
     source_security_group_id = aws_security_group.worker-user.id
 }
 
+resource "aws_security_group_rule" "worker-internet-out" {
+    type = "egress"
+    security_group_id = aws_security_group.worker.id
+    from_port = 443
+    to_port = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "tcp"
+}
+
 # WORKER USER
 resource "aws_security_group" "worker-user" {
     name = "worker-user"
@@ -208,6 +217,7 @@ resource "aws_security_group_rule" "worker-user-out" {
     to_port = 8793
     protocol = "tcp"
 }
+
 
 # WEBSERVER (connect to rds, workers, bastion)
 resource "aws_security_group" "webserver" {
@@ -238,6 +248,16 @@ resource "aws_security_group_rule" "worker-user-out-webserver" {
     protocol = "tcp"
 }
 
+resource "aws_security_group_rule" "webserver-internet-out" {
+    type = "egress"
+    security_group_id = aws_security_group.webserver.id
+    from_port = 443
+    to_port = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "tcp"
+}
+
+
 # Load balancer
 resource "aws_security_group" "load-balancer" {
     name = "jc_pipeline_alb"
@@ -264,5 +284,24 @@ resource "aws_security_group_rule" "alb-to-webserver" {
     source_security_group_id = aws_security_group.webserver.id
     from_port = 8080
     to_port = 8080
+    protocol = "tcp"
+}
+
+# INTERNET USER
+resource "aws_security_group" "internet-user" {
+    name = "internet-access"
+    description = "Allows instances to reach out via HTTPS"
+    vpc_id = aws_vpc.airflow.id
+    tags = {
+        Name = "internet-access"
+    }
+}
+
+resource "aws_security_group_rule" "internet-out" {
+    type = "egress"
+    security_group_id = aws_security_group.internet-user.id
+    from_port = 443
+    to_port = 443
+    cidr_blocks = ["0.0.0.0/0"]
     protocol = "tcp"
 }

@@ -23,7 +23,8 @@ data  "template_file" "webserver" {
         name = "webserver"
         account_id = var.account_id
         private_key_arn = aws_secretsmanager_secret.github_ssh_private_key.arn
-        queue_ip = "jc.pipeline.queue"
+        queue_ip = "queue.jc.pipeline"
+        postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
     }
 }
 
@@ -76,7 +77,8 @@ data  "template_file" "scheduler" {
         name = "scheduler"
         account_id = var.account_id
         private_key_arn = ""
-        queue_ip = "jc.pipeline.queue"
+        queue_ip = "queue.jc.pipeline"
+        postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
     }
 }
 
@@ -93,7 +95,8 @@ resource "aws_ecs_service" "scheduler" {
             aws_security_group.ssh-from-bastion.id,
             aws_security_group.queue-user.id,
             aws_security_group.flower-user.id,
-            aws_security_group.airflow-db-user.id
+            aws_security_group.airflow-db-user.id,
+            aws_security_group.internet-user.id
         ]
     }
 }
@@ -119,7 +122,8 @@ data  "template_file" "worker" {
         name = "worker"
         account_id = var.account_id
         private_key_arn = aws_secretsmanager_secret.github_ssh_private_key.arn
-        queue_ip = "jc.pipeline.queue"
+        queue_ip = "queue.jc.pipeline"
+        postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
     }
 }
 
@@ -163,7 +167,8 @@ data  "template_file" "flower" {
         name = "flower"
         account_id = var.account_id
         private_key_arn = ""
-        queue_ip = "jc.pipeline.queue"
+        queue_ip = "queue.jc.pipeline"
+        postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
     }
 }
 
@@ -180,7 +185,9 @@ resource "aws_ecs_service" "flower" {
             aws_security_group.ssh-from-bastion.id,
             aws_security_group.flower.id,
             aws_security_group.queue-user.id,
+            aws_security_group.internet-user.id
         ]
+        assign_public_ip = true
     }
 }
 
@@ -229,7 +236,8 @@ resource "aws_ecs_service" "queue" {
         subnets = [aws_subnet.private.id]
         security_groups = [
             aws_security_group.ssh-from-bastion.id,
-            aws_security_group.queue.id
+            aws_security_group.queue.id,
+            aws_security_group.internet-user.id
         ]
     }
 }

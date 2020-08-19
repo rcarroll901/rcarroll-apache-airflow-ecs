@@ -1,7 +1,7 @@
 [
     {
       "name": "${name}",
-      "image": "${account_id}.dkr.ecr.us-east-2.amazonaws.com/jc-pipeline",
+      "image": "${account_id}.dkr.ecr.us-east-2.amazonaws.com/jc-pipeline:latest",
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -50,6 +50,8 @@
             "value": "airflow"},
           {"name": "POSTGRES_DB",
             "value": "airflow"},
+          {"name": "POSTGRES_HOST",
+            "value": "${postgres_host}"},
           {"name": "QUEUE_HOST",
             "value": "${queue_ip}"}
           ],

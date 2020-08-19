@@ -40,8 +40,8 @@ data "aws_iam_policy_document" "ecs_secret_policy" {
             "kms:Decrypt"
             ]
         resources = [
-            "arn:aws:secretsmanager:${var.region}:${var.account_id}:secret:${aws_secretsmanager_secret.github_ssh_private_key.name}",
-            "arn:aws:kms::${var.account_id}:key/${aws_kms_key.jc_pipeline_key.key_id}"
+            aws_secretsmanager_secret.github_ssh_private_key.arn,
+            aws_kms_key.jc_pipeline_key.arn
             ]
     }
 }
@@ -56,4 +56,14 @@ resource "aws_iam_policy" "ecs_secret_policy" {
 resource "aws_iam_role_policy_attachment" "secret_task_role" {
   role       = aws_iam_role.secret_task_role.name
   policy_arn = aws_iam_policy.ecs_secret_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "secret_task_execution_role" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_secret_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_2" {
+    role       = aws_iam_role.ecs_task_execution_role.name
+    policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
