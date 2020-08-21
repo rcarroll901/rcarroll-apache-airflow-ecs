@@ -1,6 +1,7 @@
 
 resource "aws_vpc" "airflow" {
     cidr_block = "10.0.0.0/16"
+    enable_dns_hostnames = true
     tags = {
         Name = "airflow_vpc"
     }
@@ -93,3 +94,7 @@ resource "aws_key_pair" "just_city" {
     }
 }
 
+resource "aws_eip" "bastion" {
+  instance = aws_instance.bastion.id
+  vpc      = true
+}

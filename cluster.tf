@@ -8,8 +8,8 @@ resource "aws_ecs_cluster" "jc_pipeline" {
 resource "aws_ecs_task_definition" "webserver" {
     family                = "webserver"
     requires_compatibilities = ["FARGATE"]
-    cpu = 256
-    memory = 512
+    cpu = 512
+    memory = 1024
     task_role_arn = aws_iam_role.secret_task_role.arn
     execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.webserver.rendered
@@ -23,8 +23,13 @@ data  "template_file" "webserver" {
         name = "webserver"
         account_id = var.account_id
         private_key_arn = aws_secretsmanager_secret.github_ssh_private_key.arn
-        queue_ip = "queue.jc.pipeline"
+        queue_ip = var.queue_dns
+        db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
+        db_user = var.database_username
+        db_password = var.database_password
+        cpu = 512
+        memory = 1024
     }
 }
 
@@ -62,8 +67,8 @@ resource "aws_ecs_service" "webserver" {
 resource "aws_ecs_task_definition" "scheduler" {
     family                = "scheduler"
     requires_compatibilities = ["FARGATE"]
-    cpu = 256
-    memory = 512
+    cpu = 512
+    memory = 2048
     task_role_arn = aws_iam_role.secret_task_role.arn
     execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.scheduler.rendered
@@ -77,8 +82,13 @@ data  "template_file" "scheduler" {
         name = "scheduler"
         account_id = var.account_id
         private_key_arn = ""
-        queue_ip = "queue.jc.pipeline"
+        queue_ip = var.queue_dns
+        db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
+        db_user = var.database_username
+        db_password = var.database_password
+        cpu = 512
+        memory = 2048
     }
 }
 
@@ -107,8 +117,8 @@ resource "aws_ecs_service" "scheduler" {
 resource "aws_ecs_task_definition" "worker" {
     family                = "worker"
     requires_compatibilities = ["FARGATE"]
-    cpu = 256
-    memory = 512
+    cpu = 1024
+    memory = 3072
     task_role_arn = aws_iam_role.secret_task_role.arn
     execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     container_definitions = data.template_file.worker.rendered
@@ -122,8 +132,13 @@ data  "template_file" "worker" {
         name = "worker"
         account_id = var.account_id
         private_key_arn = aws_secretsmanager_secret.github_ssh_private_key.arn
-        queue_ip = "queue.jc.pipeline"
+        queue_ip = var.queue_dns
+        db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
+        db_user = var.database_username
+        db_password = var.database_password
+        cpu = 1024
+        memory = 3072
     }
 }
 
@@ -167,8 +182,13 @@ data  "template_file" "flower" {
         name = "flower"
         account_id = var.account_id
         private_key_arn = ""
-        queue_ip = "queue.jc.pipeline"
+        queue_ip = var.queue_dns
+        db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
+        db_user = var.database_username
+        db_password = var.database_password
+        cpu = 256
+        memory = 512
     }
 }
 
@@ -200,20 +220,24 @@ resource "aws_ecs_task_definition" "queue" {
     task_role_arn = aws_iam_role.secret_task_role.arn
     execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
     network_mode = "awsvpc"
-    cpu = 256
-    memory = 512
+    cpu = 1024
+    memory = 2048
     container_definitions = <<DEFINITION
 [
   {
     "name": "rabbitmq",
-    "cpu": 2,
-    "memory": 500,
+    "cpu": 1024,
+    "memory": 2048,
     "image": "rabbitmq:latest",
     "essential": true,
     "portMappings": [
       {
         "containerPort": 5672,
         "hostPort": 5672
+      },
+      {
+        "containerPort": 22,
+        "hostPort": 22
       }
     ]
   }
@@ -225,8 +249,8 @@ resource "aws_ecs_service" "queue" {
   	name            = "queue"
   	cluster         = aws_ecs_cluster.jc_pipeline.id
   	task_definition = aws_ecs_task_definition.queue.family
-    launch_type = "FARGATE"
   	desired_count   = 1
+    launch_type     = "FARGATE"
 
     service_registries {
         registry_arn = aws_service_discovery_service.queue.arn

@@ -30,3 +30,7 @@ variable "database_username" {
 variable "database_password" {
     description = "password to log into databases"
 }
+
+variable "queue_dns" {
+    description = "route 53 dns name for queue instance"
+}
