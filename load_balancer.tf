@@ -3,6 +3,11 @@ resource "aws_alb" "webserver-load-balancer" {
     name = "webserver-load-balancer"
     security_groups = [aws_security_group.load-balancer.id]
     subnets = [aws_subnet.public.id, aws_subnet.private.id]
+
+    access_logs {
+        bucket = "jc-pipeline-load-balancer"
+        enabled = true
+    }
 }
 
 resource "aws_alb_target_group" "webserver-group" {
@@ -15,11 +20,11 @@ resource "aws_alb_target_group" "webserver-group" {
 
     health_check {
         healthy_threshold   = "5"
-        unhealthy_threshold = "2"
-        interval            = "30"
+        unhealthy_threshold = "5"
+        interval            = "120"
         matcher             = "200"
         path                = "/"
-        port                = "traffic-port"
+        port                = "8080"
         protocol            = "HTTP"
         timeout             = "5"
     }

@@ -230,6 +230,14 @@ resource "aws_ecs_task_definition" "queue" {
     "memory": 2048,
     "image": "rabbitmq:latest",
     "essential": true,
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "practice",
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "queue"
+        }
+    },
     "portMappings": [
       {
         "containerPort": 5672,
