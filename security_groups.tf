@@ -190,6 +190,15 @@ resource "aws_security_group_rule" "worker-user-in" {
     source_security_group_id = aws_security_group.worker-user.id
 }
 
+resource "aws_security_group_rule" "webserver-in" {
+    type = "ingress"
+    from_port = 8793
+    to_port = 8793
+    protocol = "tcp"
+    security_group_id = aws_security_group.worker.id
+    source_security_group_id = aws_security_group.webserver.id
+}
+
 resource "aws_security_group_rule" "worker-internet-out" {
     type = "egress"
     security_group_id = aws_security_group.worker.id
