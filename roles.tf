@@ -67,3 +67,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_2" {
     role       = aws_iam_role.ecs_task_execution_role.name
     policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_s3" {
+    role       = aws_iam_role.ecs_task_execution_role.name
+    policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}

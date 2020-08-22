@@ -5,7 +5,7 @@ resource "aws_secretsmanager_secret" "github_ssh_private_key" {
 
 resource "aws_secretsmanager_secret_version" "github_ssh_private_key" {
   secret_id     = aws_secretsmanager_secret.github_ssh_private_key.id
-  secret_string = file(var.github_key_path)
+  secret_string = var.github_ssh_private_key
 }
 
 resource "aws_kms_key" "jc_pipeline_key" {

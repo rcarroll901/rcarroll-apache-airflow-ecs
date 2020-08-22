@@ -11,12 +11,12 @@ variable "region" {
     description = "AWS region to create/manage resources"
 }
 
-variable "key_path" {
-    description = "file path to public key"
+variable "access_ssh_public_key" {
+    description = "public key for accessing bastion"
 }
 
-variable "github_key_path" {
-    description = "file path to private key to get access to private github repos"
+variable "github_ssh_private_key" {
+    description = "private key to get access to private github repos"
 }
 
 variable "account_id" {

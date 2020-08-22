@@ -32,7 +32,7 @@ resource "aws_nat_gateway" "airflow" {
 resource "aws_subnet" "public" {
     vpc_id = aws_vpc.airflow.id
     cidr_block = "10.0.1.0/24"
-    availability_zone = "us-east-2a"
+    availability_zone = "${var.region}a"
     tags = {
         Name = "airflow_public_sn"
     }
@@ -41,7 +41,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
     vpc_id = aws_vpc.airflow.id
     cidr_block = "10.0.2.0/24"
-    availability_zone = "us-east-2b"
+    availability_zone = "${var.region}b"
     tags = {
         Name = "airflow_private_sn"
     }
@@ -68,7 +68,7 @@ resource "aws_route_table_association" "public-rta" {
 resource "aws_route" "nat" {
   route_table_id            = aws_vpc.airflow.main_route_table_id
   destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id                = aws_nat_gateway.airflow.id
+  nat_gateway_id            = aws_nat_gateway.airflow.id
 }
 
 
@@ -88,7 +88,7 @@ resource "aws_instance" "bastion" {
 
 resource "aws_key_pair" "just_city" {
     key_name = "to-bastion-jc-pipeline"
-    public_key = file(var.key_path)
+    public_key = var.access_ssh_public_key
     tags = {
         Name = "just_city_key_pair"
     }

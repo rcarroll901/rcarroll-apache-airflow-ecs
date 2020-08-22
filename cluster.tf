@@ -205,7 +205,8 @@ resource "aws_ecs_service" "flower" {
             aws_security_group.ssh-from-bastion.id,
             aws_security_group.flower.id,
             aws_security_group.queue-user.id,
-            aws_security_group.internet-user.id
+            aws_security_group.internet-user.id,
+            aws_security_group.airflow-db-user.id
         ]
         assign_public_ip = true
     }
