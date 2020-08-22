@@ -53,10 +53,13 @@
           {"name": "POSTGRES_HOST",
             "value": "${postgres_host}"},
           {"name": "QUEUE_HOST",
-            "value": "${queue_ip}"}
+            "value": "${queue_ip}"},
+          {"name": "AIRFLOW__CORE__BASE_LOGS_FOLDER",
+            "value": "/airflow_logs"},
+          {"name": "AIRFLOW__CORE__DAG_PROCESSOR_MANAGER_LOG_LOCATION",
+            "value": "/tmp/dag_processor_manager.log"} # TODO: change permissions in container so we can write this log to a real place
           ],
       "memory": ${memory},
       "cpu": ${cpu}
     }
 ]
-
