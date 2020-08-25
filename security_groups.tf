@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "bastion-ssh-from-world" {
     protocol = "tcp"
     # restrict this to only necessary IPs
     security_group_id = aws_security_group.bastion.id
-    cidr_blocks = ["0.0.0.0/0"] # how to keep this dynamic and allow multiple?
+    cidr_blocks = var.allowed_cidr_blocks
 }
 
 resource "aws_security_group_rule" "bastion-ssh-out" {

@@ -35,7 +35,7 @@ variable "queue_dns" {
     description = "route 53 dns name for queue instance"
 }
 
-variable "allowed_ip" { # I want to make this to list of ips later.
-    description = " ip addresses that can access vpc. "
-    type = string
+variable "allowed_cidr_blocks" { # I want to make this to list of ips later.
+    description = " ip addresses (with "/32" at the end) that can access vpc."
+    type = list(string)
 }
