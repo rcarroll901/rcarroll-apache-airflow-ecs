@@ -34,3 +34,8 @@ variable "database_password" {
 variable "queue_dns" {
     description = "route 53 dns name for queue instance"
 }
+
+variable "allowed_ip" { # I want to make this to list of ips later.
+    description = " ip addresses that can access vpc. "
+    type = string
+}

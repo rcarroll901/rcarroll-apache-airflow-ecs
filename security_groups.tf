@@ -238,7 +238,7 @@ resource "aws_security_group" "webserver" {
     }
 }
 
-resource "aws_security_group_rule" "webserver-from-world" {
+resource "aws_security_group_rule" "webserver-from-alb" {
     type = "ingress"
     from_port = 8080
     to_port = 8080
@@ -282,9 +282,8 @@ resource "aws_security_group_rule" "alb-from-world" {
     from_port = 8080
     to_port = 8080
     protocol = "tcp"
-    # restrict this to only necessary IPs
     security_group_id = aws_security_group.load-balancer.id
-    cidr_blocks = ["0.0.0.0/0"] 
+    cidr_blocks = ["${var.allowed_ip}/32"] 
 }
 
 resource "aws_security_group_rule" "alb-to-webserver" {
