@@ -22,11 +22,11 @@ resource "aws_alb_target_group" "webserver-group" {
         healthy_threshold   = "5"
         unhealthy_threshold = "5"
         interval            = "120"
-        matcher             = "200"
+        matcher             = "302"
         path                = "/"
         port                = "8080"
         protocol            = "HTTP"
-        timeout             = "5"
+        timeout             = "60"
     }
 
     tags = {
