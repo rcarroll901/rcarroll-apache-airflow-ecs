@@ -26,8 +26,8 @@ data  "template_file" "webserver" {
         queue_ip = var.queue_dns
         db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
-        db_user = var.database_username
-        db_password = var.database_password
+        db_user = var.db_username
+        db_password = var.db_password
         cpu = 512
         memory = 1024
     }
@@ -85,8 +85,8 @@ data  "template_file" "scheduler" {
         queue_ip = var.queue_dns
         db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
-        db_user = var.database_username
-        db_password = var.database_password
+        db_user = var.db_username
+        db_password = var.db_password
         cpu = 512
         memory = 2048
     }
@@ -135,8 +135,8 @@ data  "template_file" "worker" {
         queue_ip = var.queue_dns
         db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
-        db_user = var.database_username
-        db_password = var.database_password
+        db_user = var.db_username
+        db_password = var.db_password
         cpu = 1024
         memory = 3072
     }
@@ -185,8 +185,8 @@ data  "template_file" "flower" {
         queue_ip = var.queue_dns
         db_name = aws_rds_cluster.airflow-meta-db.database_name
         postgres_host = aws_rds_cluster.airflow-meta-db.endpoint
-        db_user = var.database_username
-        db_password = var.database_password
+        db_user = var.db_username
+        db_password = var.db_password
         cpu = 256
         memory = 512
     }

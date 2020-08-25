@@ -7,8 +7,8 @@ resource "aws_rds_cluster" "airflow-meta-db" {
   engine_version          = "11.6"
   vpc_security_group_ids  = [aws_security_group.airflow-db.id]
   db_subnet_group_name    = aws_db_subnet_group.main.name
-  master_username         = var.database_username
-  master_password         = var.database_password
+  master_username         = var.db_username
+  master_password         = var.db_password
   skip_final_snapshot  = true
 }
 
@@ -31,8 +31,8 @@ resource "aws_rds_cluster" "jc-db" {
   database_name           = "jc_pipeline_metadb"
   vpc_security_group_ids  = [aws_security_group.airflow-db.id]
   db_subnet_group_name    = aws_db_subnet_group.main.name
-  master_username         = var.database_username
-  master_password         = var.database_password
+  master_username         = var.db_username
+  master_password         = var.db_password
   skip_final_snapshot  = true
 }
 

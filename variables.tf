@@ -23,11 +23,11 @@ variable "account_id" {
     description = "IAM account ID"
 }
 
-variable "database_username" {
+variable "db_username" {
     description = "username to log into databases"
 }
 
-variable "database_password" {
+variable "db_password" {
     description = "password to log into databases"
 }
 

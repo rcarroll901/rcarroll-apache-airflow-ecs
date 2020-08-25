@@ -283,7 +283,7 @@ resource "aws_security_group_rule" "alb-from-world" {
     to_port = 8080
     protocol = "tcp"
     security_group_id = aws_security_group.load-balancer.id
-    cidr_blocks = ["${var.allowed_ip}/32"] 
+    cidr_blocks = var.allowed_cidr_blocks
 }
 
 resource "aws_security_group_rule" "alb-to-webserver" {
